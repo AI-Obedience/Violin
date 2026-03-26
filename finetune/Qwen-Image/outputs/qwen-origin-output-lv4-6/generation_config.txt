@@ -1,0 +1,18 @@
+Generation Config - 2026-01-27 06:53:36
+==================================================
+total_data: 15100
+model_name: Qwen/Qwen-Image
+lora_weights: None
+output_dir: outputs/Qwen-Image_P4-5-6_C1-2-3_test_full
+base_dir: ColorBench-v1/Test_Sets
+prompt_levels: [4, 5, 6]
+color_levels: [1, 2, 3]
+split: test
+max_samples_per_dir: None (full data)
+negative_prompt:  
+width: 384
+height: 384
+num_inference_steps: 50
+true_cfg_scale: 5.0
+base_seed: 42
+batch_size: 64
