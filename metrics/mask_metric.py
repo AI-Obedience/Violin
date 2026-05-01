@@ -39,14 +39,14 @@ def Metric_Boundary_IoU(bin_gen, bin_gt, d=5):
 
 
 
-def Metric_Leak(img_gen_bgr, bin_gen_filled):
+def Metric_Leak(img_gen_bgr, bin_gt_filled):
     # Erode 3 pixels, exclude the edge anti-aliasing area, and only look at the inside of the mask core.
     kernel = np.ones((3, 3), np.uint8)
-    inner_mask = cv2.erode(bin_gen_filled, kernel, iterations=3)
+    inner_mask = cv2.erode(bin_gt_filled, kernel, iterations=3)
     
     mask = inner_mask > 0
     if not np.any(mask): 
-        mask = bin_gen_filled > 0
+        mask = bin_gt_filled > 0
         if not np.any(mask): return 0.0
     
     gray_gen = cv2.cvtColor(img_gen_bgr, cv2.COLOR_BGR2GRAY)
@@ -55,36 +55,32 @@ def Metric_Leak(img_gen_bgr, bin_gen_filled):
 
 
 
-def Metric_Mask_Edge(img_gen_bgr, bin_gen_filled):
-    """
-    Edge sharpness is calculated using the original pixels of the generated image, rather than the binary image.
-    """
-    # 1. Extract the grayscale image of the generated image
+def Metric_Mask_Edge(img_gen_bgr, img_gt_bgr, bin_gt_filled):
     gray_gen = cv2.cvtColor(img_gen_bgr, cv2.COLOR_BGR2GRAY)
+    gray_gt = cv2.cvtColor(img_gt_bgr, cv2.COLOR_BGR2GRAY)
     
-    # 2. Extract the edge band from the GT Mask (only evaluate within 3-5 pixels of the edge)
     kernel = np.ones((3,3), np.uint8)
-    # Extract the contour lines
-    edge_mask = cv2.Canny(bin_gen_filled, 100, 200)
-    # Expand it slightly to form a strip-shaped area covering the edge.
+    edge_mask = cv2.Canny(bin_gt_filled, 100, 200)
     edge_zone = cv2.dilate(edge_mask, kernel, iterations=2)
     
-    if np.count_nonzero(edge_zone) == 0: return 1.0
+    if np.count_nonzero(edge_zone) == 0: return 0.0
 
-    # 3. Calculate the gradient of the generated image within the edge band
-    sx = cv2.Sobel(gray_gen, cv2.CV_64F, 1, 0, ksize=3)
-    sy = cv2.Sobel(gray_gen, cv2.CV_64F, 0, 1, ksize=3)
-    grad = np.sqrt(sx**2 + sy**2)
+    # gradient computation function
+    def get_avg_grad(img_gray, mask):
+        sx = cv2.Sobel(img_gray, cv2.CV_64F, 1, 0, ksize=3)
+        sy = cv2.Sobel(img_gray, cv2.CV_64F, 0, 1, ksize=3)
+        grad = np.sqrt(sx**2 + sy**2)
+        return grad[mask > 0].mean()
+
+    # Calculate the average gradient magnitude in the edge zone for both GT and Gen
+    gt_grad = get_avg_grad(gray_gt, edge_zone)
+    gen_grad = get_avg_grad(gray_gen, edge_zone)
+
+    # If GT edge is very weak, we can't really evaluate edge quality, so we default to 0.
+    if gt_grad < 1.0: return 0.0
     
-    # Only take the gradient values within the edge band
-    edge_grads = grad[edge_zone > 0]
-    avg_grad = edge_grads.mean()
-
-    # 4. Normalized Mapping
-    # For a sharp edge, the gradient from 0 (mask) to >100 (background) is very high.
-    # Set a baseline value, such as 150. The higher the gradient, the smaller the error.
-    ref_grad = 150.0 
-    score = 1.0 - (avg_grad / ref_grad)
+    # 计算相对损失
+    score = 1.0 - (gen_grad / gt_grad)
     
     return max(0.0, min(1.0, score))
 
@@ -122,7 +118,7 @@ def Mask_metrics_from_img_bgr(img_gen, img_gt, threshold=30, return_mean=True):
         
         'd_leak': Metric_Leak(img_gen, bin_gt_filled), 
         
-        'd_edge': Metric_Mask_Edge(img_gen, bin_gen_filled)
+        'd_edge': Metric_Mask_Edge(img_gen, img_gt, bin_gt_filled)
     }
     
     if return_mean:
