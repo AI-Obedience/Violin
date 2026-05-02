@@ -6,7 +6,7 @@ from skimage.color import deltaE_ciede2000
 
 """
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-  IMPORTANT: For 'is_multi_block' mode, 'img_gt' (or 'path_gt') MUST be the Ground Truth. 
+  IMPORTANT: 'img_gt' (or 'path_gt' or 'tensor2') MUST be the Ground Truth. 
   The code uses the Ground Truth to automatically detect color split directions.
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -81,19 +81,58 @@ def dict_mean(dicts):
 # ==========================================
 # 2. Core Metric Components
 # ==========================================
-
 def calc_rgb_dist(img1_bgr, img2_bgr):
-    """(1) RGB Euclidean Distance: Measures digital signal alignment."""
-    diff = img1_bgr.astype(np.float32) - img2_bgr.astype(np.float32)
-    dist = np.sqrt(np.sum(diff**2, axis=2)).mean().item()
-    return min(dist / 441.67, 1.0) # Normalized by sqrt(255^2 * 3)
+    """
+    (1) RGB distance (increased fault tolerance):
+    Calculate the distance of the average color of the region and ignore small numerical fluctuations.
+    """
+    
+    m1 = np.mean(img1_bgr, axis=(0, 1))
+    m2 = np.mean(img2_bgr, axis=(0, 1))
+    
+    dist = np.linalg.norm(m1 - m2)
+    
+    # --- Fault Tolerance Logic ---
+    # If the average color difference is within 5 pixel values ​​(0-255 range),
+    #  it is considered to be without deviation.
+    tolerance = 5.0 
+    dist = max(0, dist - tolerance)
+    
+    return float(min(dist / 441.67, 1.0))
 
 def calc_lab_ciede(img1_bgr, img2_bgr):
-    """(2) CIEDE2000: Measures perceptual color accuracy."""
+    """
+    (2) CIEDE2000 (increased fault tolerance):
+    Calculate the perceptual difference of the average colors and introduce JND (Just Noticeable Difference).
+    """
+    # Convert to LAB and take the mean
     lab1 = convert_BGR_to_LAB(img1_bgr)
     lab2 = convert_BGR_to_LAB(img2_bgr)
-    res = deltaE_ciede2000(lab1, lab2).mean().item()
-    return min(res / 100.0, 1.0) # Normalized by max CIE error
+    m1 = np.mean(lab1, axis=(0, 1))
+    m2 = np.mean(lab2, axis=(0, 1))
+    
+    # Calculate the perceptual difference between the two average color points
+    res = deltaE_ciede2000(m1[None, None, :], m2[None, None, :]).item()
+    
+    # --- Fault Tolerance Logic ---
+    # JND (Just Noticeable Difference): Usually considered that Delta E < 3.0 is imperceptible to the human eye
+    jnd_threshold = 3.0 
+    res = max(0, res - jnd_threshold)
+    
+    return float(min(res / 100.0, 1.0))
+
+# def calc_rgb_dist(img1_bgr, img2_bgr):
+#     """(1) RGB Euclidean Distance: Measures digital signal alignment."""
+#     diff = img1_bgr.astype(np.float32) - img2_bgr.astype(np.float32)
+#     dist = np.sqrt(np.sum(diff**2, axis=2)).mean().item()
+#     return min(dist / 441.67, 1.0) # Normalized by sqrt(255^2 * 3)
+
+# def calc_lab_ciede(img1_bgr, img2_bgr):
+#     """(2) CIEDE2000: Measures perceptual color accuracy."""
+#     lab1 = convert_BGR_to_LAB(img1_bgr)
+#     lab2 = convert_BGR_to_LAB(img2_bgr)
+#     res = deltaE_ciede2000(lab1, lab2).mean().item()
+#     return min(res / 100.0, 1.0) # Normalized by max CIE error
 
 def calc_std(img_bgr):
     """(3) Standard Deviation: Measures global pixel consistency."""
@@ -213,7 +252,6 @@ def Color_metrics_from_tensor(tensor_gen, tensor_gt, return_each_sample=False, *
 
 if __name__ == '__main__':
     # Usage Example:
-    # Single Color
     res = Color_metrics_from_img_list(['metrics_v2\\color_cases\\id_1.png'], ['metrics_v2\\color_cases\\id_2.png'])
     print(res)
     res_multi = Color_metrics_from_img_list(['metrics_v2\\multi_cases\\id_3.png'], ['metrics_v2\\multi_cases\\id_4.png'], is_multi_block=True)
