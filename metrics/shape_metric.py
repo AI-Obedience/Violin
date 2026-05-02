@@ -3,6 +3,18 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
+"""
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+'img_gt' (or 'path_gt' or 'tensor2') MUST be the Ground Truth. 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+You can use:
+    - Shape_metrics_from_img_bgr
+    - Shape_metrics_from_img_path
+    - Shape_metrics_from_img_list
+    - Shape_metrics_from_tensor
+"""
+
 def load_image(img_path):
     img = cv2.imread(img_path)
     if img is None:

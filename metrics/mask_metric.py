@@ -10,6 +10,21 @@ if current_dir not in sys.path:
     sys.path.append(current_dir)
 from shape_metric import load_image, tensor2npBGR, change_list2dict, dict_mean, dict2tensor, Metric_IoU, Metric_Dist
 
+
+
+"""
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+'img_gt' (or 'path_gt' or 'tensor2') MUST be the Ground Truth. 
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+You can use:
+    - Mask_metrics_from_img_bgr
+    - Mask_metrics_from_img_path
+    - Mask_metrics_from_img_list
+    - Mask_metrics_from_tensor
+"""
+
+
 def get_mask_binary(img, threshold=127):
     if len(img.shape) == 3:
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
