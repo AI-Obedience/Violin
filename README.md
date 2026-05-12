@@ -1,7 +1,8 @@
 <h1>
-  <img src="assets/logo.png" style="height: 1.6em; vertical-align: middle;">
+  <img src="assets/logo.png" style="height: 1.2em; vertical-align: middle;">
   Violin: Exploring the AI Obedience: Why is Generating a Pure Color Image Harder than CyberPunk?
 </h1>
+
 
 
 <p align="center">
