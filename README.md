@@ -1,4 +1,8 @@
-## Violin: Exploring the AI Obedience: Why is Generating a Pure Color Image Harder than CyberPunk?
+<h2>
+  <img src="assets/logo.png" style="height: 1.2em; vertical-align: middle;">
+  Violin: Exploring the AI Obedience: Why is Generating a Pure Color Image Harder than CyberPunk?
+</h2>
+
 
 <p align="center">
     <a href="https://arxiv.org/abs/2603.00166"><img src="https://img.shields.io/badge/arXiv-2603.00166-b31b1b.svg"></a>
@@ -25,7 +29,7 @@
   Using Violin, we evaluate several state-of-the-art models and reveal that closed-source models generally outperform open-source ones in deterministic precision. Interestingly, performance on our benchmark correlates with the benchmark in natural image generation. 
   Our work provides a foundational framework and tools for achieving better alignment between human instructions and model outputs.
 
-
+![Benchmark Diagram](assets/benchmark_display.png)
 
 
 
@@ -107,6 +111,42 @@ python eval_open_source/evaluate/evaluate_open_source_models.py \
     generated_shape.png ground_truth_shape.png \
     --type shape
 ```
+
+
+
+## 📊 Obedience Evaluation Results
+
+### Comparison of Level-4 Obedience on Pure Color Generation Task
+
+| Type | Models | rgb-ed | lab-00 | sd | ced | hf | **color-mean** |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Open-Source** | FLUX.1 | 0.206 | 0.167 | 0.064 | 0.006 | 0.016 | **0.091** |
+| | FLUX.2 | 0.123 | 0.091 | 0.044 | 0.007 | 0.021 | **0.057** |
+| | Z-Image | 0.135 | 0.092 | 0.078 | 0.002 | 0.007 | **0.061** |
+| | Qwen-Image | 0.122 | 0.084 | 0.047 | 0.002 | 0.017 | **0.057** |
+| **Closed-Source** | Nano-Banana-2 | 0.126 | 0.093 | 0.033 | 0.001 | 0.010 | **0.053** |
+| | Seedream-5 | 0.134 | 0.093 | 0.015 | 0.001 | 0.001 | **0.049** |
+| | GPT-Image-2 | 0.137 | 0.083 | 0.006 | 0.000 | 0.031 | **0.051** |
+
+### Comparison of Level-4 Obedience on Geometric Shape Generation Task
+| Type | Models | iou | size | shape | purity | dist | **mask-mean** |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Open-Source** | FLUX.1 | 0.725 | 0.703 | 0.167 | 0.172 | 0.267 | **0.407** |
+| | FLUX.2 | 0.607 | 0.659 | 0.004 | 0.127 | 0.122 | **0.304** |
+| | Z-Image | 0.648 | 0.686 | 0.002 | 0.133 | 0.409 | **0.376** |
+| | Qwen-Image | 0.645 | 0.630 | 0.001 | 0.283 | 0.128 | **0.337** |
+| **Closed-Source** | Nano-Banana-2 | 0.566 | 0.597 | 0.046 | 0.105 | 0.097 | **0.282** |
+| | Seedream-5 | 0.551 | 0.376 | 0.006 | 0.035 | 0.070 | **0.207** |
+| | GPT-Image-2 | 0.317 | 0.278 | 0.003 | 0.038 | 0.033 | **0.134** |
+
+### Comparison of Level-4 Obedience on Image Mask Task
+
+| Type | Models | iou | biou | leak | edge | dist | **shape-mean** |
+| :--- | :--- | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Open-Source** | FLUX.2 | 0.848 | 0.948 | 0.438 | 0.131 | 0.197 | **0.512** |
+| **Closed-Source** | Nano-Banana-2 | 0.474 | 0.772 | 0.286 | 0.172 | 0.127 | **0.366** |
+| | Seedream-5 | 0.331 | 0.725 | 0.177 | 0.073 | 0.093 | **0.280** |
+| | GPT-Image-2 | 0.096 | 0.398 | 0.087 | 0.186 | 0.023 | **0.158** |
 
 
 
