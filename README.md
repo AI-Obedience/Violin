@@ -12,8 +12,8 @@
 </p>
 
 ## 🔥 News
-* **2026.5.12:** The Violin dataset and Project Page bas been released.
-* **2026.5.11:** The paper has been released.
+* **2026.5.12:** The Violin Benchmark and Project Page bas been released.
+* **2026.5.11:** The Paper has been released.
 
 
 ![Introduction Diagram](assets/introduction.png)
@@ -29,7 +29,7 @@ We formalize AI Obedience (Levels 1–5) and introduce Violin, the first benchma
 
 
 
-## 🤗 Dataset Download
+## 🤗 Benchmark Download
 
 Please run the following commands to download the dataset:
 
