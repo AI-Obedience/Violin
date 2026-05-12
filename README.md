@@ -19,15 +19,10 @@
 
 
 ## 🎨 Introduction
+Generative AI excels at complexity but faces a "Paradox of Simplicity": models often fail at low-entropy tasks like generating pure color images. We attribute this to "aesthetic bias," where emergent scaling priors override deterministic simplicity, hindering the transition to true abstraction.
+We formalize AI Obedience (Levels 1–5) and introduce Violin, the first benchmark for Level 4 Obedience, testing color purity, masking, and geometric shapes.
 
-  Recent advances in generative AI have shown human-level performance in complex content creation. 
-  However, we identify a "Paradox of Simplicity": models that can render complex scenes often fail at trivial, low-entropy tasks, such as generating a uniform pure color image. 
-  We argue this is a systemic failure related to uncontrollable emergent abilities. 
-  As models scale, strong priors for aesthetics and complexity override deterministic simplicity, creating an "aesthetic bias" that hinders the model's transition from data simulation to true intellectual abstraction.
-  To better investigate this problem, we formalize the concept of AI Obedience, a hierarchical framework that grades a model's ability to transition from probabilistic approximation to pixel-level determinism (Levels 1 to 5).
-  We introduce Violin, the first systematic benchmark designed to evaluate Level 4 Obedience through three deterministic tasks: color purity, image masking, and geometric shape generation. 
-  Using Violin, we evaluate several state-of-the-art models and reveal that closed-source models generally outperform open-source ones in deterministic precision. Interestingly, performance on our benchmark correlates with the benchmark in natural image generation. 
-  Our work provides a foundational framework and tools for achieving better alignment between human instructions and model outputs.
+**Violin Benchmark** comprises three tasks:
 
 ![Benchmark Diagram](assets/benchmark_display.png)
 
@@ -149,8 +144,17 @@ python eval_open_source/evaluate/evaluate_open_source_models.py \
 | | GPT-Image-2 | 0.096 | 0.398 | 0.087 | 0.186 | 0.023 | **0.158** |
 
 
+## Other Obedience Tasks
 
+To evaluate the deterministic control of generative models beyond basic scenes, we extend to three mathematically constrained tasks. These experiments highlight the "Paradox of Simplicity" in SOTA models like Seedream-5.0.
 
+| Task 1: Area Ratio Control | Task 2: Pixel-level Border Alignment | Task 3: Discrete Point Counting |
+| :---: | :---: | :---: |
+| <img src="assets/square.png" width="300" alt="Area Ratio Control"> | <img src="assets/border.png" width="300" alt="Border Alignment"> | <img src="assets/random_point.png" width="300" alt="Point Counting"> |
+| **Requirement**: Exactly 13% Blue (#0000FF) and 87% Red (#FF0000). | **Requirement**: A 1024x1024 canvas with a precise 20-pixel-wide white border. | **Requirement**: Exactly 10 white dots, each being a 4x4 pixel square. |
+| **Failure**: Defaulting to 50/50 symmetry or adding forbidden gradients. | **Failure**: Inconsistent border thickness or "aesthetic" glowing effects. | **Failure**: Probabilistic noise leading to over-generation (e.g., 15+ dots). |
+
+---
 
 ## 🤝 Acknowledgements
 
