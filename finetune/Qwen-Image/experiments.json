@@ -1,7 +1,0 @@
-{
-    "qwen_origin": {
-        "output_dir": "finetune/Qwen-Image/outputs/qwen-origin",
-        "prompt_base": "ColorBench-v1/Test_Sets",
-        "split_csv_base": "ColorBench-v1/Finetune_LevelALL_Sets"
-    }
-}
