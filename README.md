@@ -7,8 +7,9 @@
 </p>
 
 ## 🔥 News
-* **2026.5.11:** The paper has been released.
 * **2026.5.12:** The Violin dataset and Project Page bas been released.
+* **2026.5.11:** The paper has been released.
+
 
 ![Introduction Diagram](assets/introduction.png)
 
